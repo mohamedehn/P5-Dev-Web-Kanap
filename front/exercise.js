@@ -42,13 +42,14 @@ console.log('description du produit:', myArrayObject[0].description);
 // Calculer somme totale des quantités dans le magasin
 
 function quantiteTotalDesProduitsDansLeMagasin(){
-    for (somme of arrayTest){
-        sumArray2 += somme
+    let quantiteTotal = 0
+    for (element of myArrayObject){
+         quantiteTotal = quantiteTotal + element.quantity
     }
-    return sumArray2
+    return quantiteTotal
 }
 
- console.log('la quantité total des produits dans le magasin est de :',);
+ console.log('la quantité total des produits dans le magasin est de :',quantiteTotalDesProduitsDansLeMagasin());
 
 // Somme d'un tableau de 20 éléments avec for
 
@@ -74,8 +75,9 @@ console.log('somme totale des valeur du tableau', sumArrayBis);
 let sumArray2 = 0
 
 function sumArrayFunction (){
-    for (somme of arrayTest){
-        sumArray2 += somme
+    for (element of arrayTest){
+        sumArray2 += element
+        // autre façon : sumArray2 = sumArray2 + element
     }
     return sumArray2
 }
@@ -119,4 +121,17 @@ function premierePageHtml(){
     let lienVersAcceuil = document.createElement ('a');
     lienVersAcceuil.textContent = "Retourner à l'accueil";
 }
-console.log(premierePageHtml);
+console.log();
+
+let parametreTableau = [1,2,3]
+
+function additionnerUnTableauAvecParametres(tableau){
+    let sommeDuTableau = 0;
+    for(numberTableau of tableau){
+        sommeDuTableau += numberTableau;
+    } 
+    console.log(parametreTableau);
+    return sommeDuTableau;
+}
+
+console.log(additionnerUnTableauAvecParametres(parametreTableau));
