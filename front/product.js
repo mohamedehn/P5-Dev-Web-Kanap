@@ -38,12 +38,10 @@ function createDetailProduct(product){
 
 // Local Storage ----------------------
 const addToCart = document.getElementById('addToCart');
-
-/////////////////////////au click ajout au panier///////////////
-if (addToCart != null){
-addToCart.addEventListener('click', (e) => {
+/////////////////////////Au click "ajout au panier" ///////////////
+addToCart.addEventListener('click', () => {
 const valueColor = document.getElementById('colors').value; // récupération de la couleur choisie
-const valueQuantity = document.getElementById('quantity').value; // récupération de la quantité choisie
+let valueQuantity = document.getElementById('quantity').value; // récupération de la quantité choisie
 
 // Contrôle si les choix sont définis et renvoi d'une alerte dans le cas contraire (réalisé avec if et else if afin d'avoir un double contrôle sur la quantité et la couleur). Les deux propriétés doivent être correctement saisies.
 if (valueColor == '') {
@@ -53,149 +51,46 @@ else if (valueQuantity <= 0 || valueQuantity > 100) {
 alert('Veuillez choisir une quantité entre 1 et 100'); // si quantité mal selectionnée, afin de respecter la tranche de 1 à 100
 } 
 else{
+//Ajout de l'article choisi dans le local storage avec la variable "article"
+let article = {
+  id : id,
+  color : valueColor,
+  quantity : Number (valueQuantity),
+};
+alert("L'article a bien été ajouté au panier")
 // On récupère le panier si déjà présent dans le local storage
-//let panier = JSON.parse(localStorage.getItem('panier'));
+let panier = JSON.parse(localStorage.getItem('panier'))
 
-//Ajout du produit choisi dans le local storage avec la variable "choiceProduct"
-const choiceProduct = [
-  id = id,
-  color = valueColor,
-  quantity = Number (valueQuantity),
-];
- // On place les produits dans le local storage
- localStorage.setItem('panier', JSON.stringify(choiceProduct))
+// Si le panier n'est pas vide, on va vérifier les ID présents et les couleurs afin d'incrémenter la quantité à défaut nous ajouterons l'article dans le panier
+if (panier != null) {  
+  console.log('Ici nous avons la valeur de :', article, panier);
+  let flag = false;
+  panier = panier.map((element)=>{
+    if(element.id === article.id && element.color === article.color){
+      element.quantity = article.quantity + element.quantity
+      flag = true
+      return element;
+    }else{
+      return element
+    }
+  })
+  localStorage.setItem("panier", JSON.stringify(panier));
+  if(!flag) {
+    console.log("L'article n'existe pas dans le panier");
+    panier.push(article);
+    localStorage.setItem("panier", JSON.stringify(panier));
+  }
+}
+//S'il n'y a pas d'articles dans le local storage on crée un tableau vide auquel nous ajouterons l'article.
+else {
+  panier = [];
+  panier.push(article);
+  localStorage.setItem("panier", JSON.stringify(panier));
+  console.log(panier);
+  alert("L'article a bien été ajouté au panier")
 }
 
-// if (productInStorage) {
-// //Ensuite on controle si l'article est présent dans le panier afin d'ajouter uniquement la quantité et non le produit une nouvelle fois
-// const getProductStorage = productInStorage.find((p) => p.id == choiceProduct.id && p.color == choiceProduct.color);
-// // Si le produit déja présent dans le panier
-// if (getProductStorage) {
-// getProductStorage.quantity = getProductStorage.quantity + choiceProduct.quantity;
-// localStorage.setItem('panier',JSON.stringify(productInStorage));
-// alert('Le panier est à jour');
-// window.location.reload();
-// return;
-// }
-// productInStorage.push(choiceProduct);
-// localStorage.setItem('panier', JSON.stringify(productInStorage));
-// // Sinon on créer un panier par le biais d'un tableau vide que l'on va incrémenter du produit choisi
-// } else {
-// productInStorage = [];
-// productInStorage.push(choiceProduct);
-// localStorage.setItem('panier', JSON.stringify(productInStorage));
-// alert("L'article a été ajouté au panier");
-// window.location.reload();
-// }
-//}
+//window.location.href = "cart.html" --> lien vers le panier
+}
+});
 
-// else {
-
-// // Récupération du panier si présent dans le localstorage
-// productInStorage = JSON.parse(localStorage.getItem('panier'));
-
-})
-};
-
-
-
-//--------------------------------------------------
-
-
-//let panier = localStorage.setItem('panier',JSON.stringify())
-
-// // Ajout d'un produit dans le panier
-// function saveProduct(panier){
-//   localStorage.setItem("panier", JSON.stringify(panier))
-// }
-
-// function getProduct(){
-//   let panier = localStorage.getItem("panier")
-//   if(panier == null){
-//     return []; // on retourne un tableau vide si le panier est vide
-//   }else{
-//     return JSON.parse(panier)
-//   }
-// }
-
-// function addProduct(choosenProduct){
-//   let panier = getProduct(); // Permet de stocker dans le local storage le produit choisi
-//   let foundProduct = panier.find(p => p.id == choosenProduct.id); // On recherche dans le panier si le produit est déjà existant.
-//   if(foundProduct != undefined){
-//     foundProduct.quantity++ // Si c'est différend de undefined c'est que le produit est présent, alors on ajoute +1
-//   }
-//   else{   // En revanche si le produit n'est pas présent on le définira à 1
-//     choosenProduct.quantity = 1;
-//     panier.push(choosenProduct);
-//   }
-//   saveProduct(panier);
-// }
-
-// // Fonction permettant de retirer un produit du panier
-// function removeFromePanier (choosenProduct){
-//   let panier = getProduct();
-//   panier = panier.filter(p => p.id != choosenProduct.id)
-// }
-
-// // Fonction pour changer la quantité d'un produit
-// function changeQuantity(choosenProduct, quantity){
-//   let foundProduct = panier.find(p => p.id == choosenProduct.id); // On recherche dans le panier si le produit est déjà existant.
-//   if(foundProduct != undefined){
-//     foundProduct.quantity += quantity; // Si c'est différend de undefined c'est que le produit est présent, alors on modifie la quantité 
-//     if(foundProduct.quantity <= 0){ // Si la quantité est à 0, la fonction nous permet de retirer du panier le produit
-//       removeFromePanier(foundProduct)
-//     }
-//   } else{
-//     saveProduct(panier)
-//   }
-// }
-
-// // Evènement pour enregistrer le produit et les caractéristiques choisis dans le panier
-// let addToCart = document.getElementById("addToCart")
-
-// addToCart.addEventListener("click", () =>{
-//   let panier = []
-//   let valueCouleur = document.getElementById("colors").value;
-//   valueCouleur.addEventListener('select', x =>{
-//   if (valueCouleur === ""){
-//     alert("Veuillez sélectionner une couleur");
-//   }
-//   else{
-//     const choixCouleur = [
-//       id = value._id,
-//       colors = valueCouleur,
-//       addProduct(choixCouleur),
-//     ]
-//   }
-// })
-//   let quantity = document.getElementById("quantity")
-//   addProduct(ajouterProduit)
-// })
-
-// Evènement pour écouter la couleur choisi
-// let couleur = document.getElementById("colors");
-// couleur.addEventListener('select', x =>{
-//   if (couleur.value === ""){
-//     alert("Veuillez sélectionner une couleur");
-//   }
-//   else{
-//     const choixCouleur = [
-//       id = productId,
-//       couleur = couleur.value,
-//       addProduct(choixCouleur),
-//     ]
-//   }
-// })
-
-
-// let panier = localStorage.setItem('panier',JSON.stringify())
-// console.log(panier);
-
-// addToCart.addEventListener('click', function ajoutPanier(addPanier){
-//   id = id;
-//   quantity = document.getElementById("quantity");
-//   quantity = addPanier.quantity;
-//   couleurProduit = document.getElementById("colors");
-//   couleurProduit = addPanier.colors;
-// })
-// console.log(ajoutPannier(addPanier));
