@@ -14,19 +14,28 @@ function getDetailProduct(productId){
     })
       }
 
-// Récupération du détail d'un produit de la page d'accueil sur la page produit.
+// Récupération du détail d'un produit de la page d'accueil sur la page produit avec création des éléments HTML
 function createDetailProduct(product){
+  // Affichage de l'image
   const img = document.createElement("img");
   const afficherImg = product.imageUrl;
   img.src = afficherImg;
   let itemImg = document.querySelector(".item__img");
   itemImg.appendChild(img);
+
+  // Affichage du titre
   let titleProduct = document.getElementById("title");
   titleProduct.textContent = product.name;
+
+  // Affichage de la description
   let descriptionProduct = document.getElementById("description");
   descriptionProduct.textContent = product.description;
+
+  // Affichage du prix
   let price = document.getElementById("price")
   price.textContent = product.price
+  
+  // Affichage de la couleur avec une boucle for afin de proposer les différentes options
   let couleur = document.getElementById("colors");
   for(choice = 0 ; choice < product.colors.length; choice++){
     let choiceColors = document.createElement("option");
