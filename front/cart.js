@@ -114,11 +114,91 @@ fetch("http://localhost:3000/api/products")
 }
 
 
+//___________________________________Contrôle des infos avec Regex et Récupération des données du formulaire____________________________________
+    
+//Création des expressions régulières pour contrôler les infos entrées par l'utilisateur
+let textRegex = new RegExp("^[^.?!:;,/\\/_-]([. '-]?[a-zA-Zàâäéèêëïîôöùûüç])+[^.?!:;,/\\/_-]$");
+let addressRegex = new RegExp("^[^.?!:;,/\\/_-]([, .:;'-]?[0-9a-zA-Zàâäéèêëïîôöùûüç])+[^.?!:;,/\\/_-]$");
+let emailRegex = new RegExp("^[^. ?!:;,/\\/_-]([._-]?[a-z0-9])+[^.?!: ;,/\\/_-][@][a-z0-9]+[.][a-z][a-z]+$");
 
-// const panier = [
-// {
-//     id : id,
-//     color : localStorage.color,
-//     quantity : localStorage.quantity,
-// }
-// ]
+//Récupération des coordonnées du formulaire client et mise en variable
+let inputFirstName = document.getElementById('firstName');
+let inputLastName = document.getElementById('lastName');
+let inputAddress = document.getElementById('address');
+let inputCity = document.getElementById('city');
+let inputEmail = document.getElementById('email');
+//Déclaration des variables pour vérifier la bonne valeur des champs du formulaire
+let checkValueFirstName;
+let checkValueLastName;
+let checkValueAddress;
+let checkValueCity;
+let checkValueEmail;  
+// Ecoute du contenu du champ "prénom", Vérification du prénom et affichage d'un message si celui-ci n'est pas correct
+inputFirstName.addEventListener('change', function() {
+    let firstNameErrorMsg = inputFirstName.nextElementSibling;
+    checkValueFirstName = textRegex.test(inputFirstName.value);
+    if (checkValueFirstName) {
+        firstNameErrorMsg.innerText = '';
+        errorFormulaireFirstName = false;
+    } 
+    else {
+        firstNameErrorMsg.innerText = 'Veuillez indiquer un prénom.';
+        errorFormulaireFirstName = true;
+        }
+    });
+
+// Ecoute du contenu du champ "nom", Vérification du nom et affichage d'un message si celui-ci n'est pas correct
+inputLastName.addEventListener('change', function() {
+    let lastNameErrorMsg = inputLastName.nextElementSibling;
+    checkValueLastName = textRegex.test(inputLastName.value);
+    if (checkValueLastName) {
+        lastNameErrorMsg.innerText = '';
+        errorFormulaireLastName = false;
+    }
+    else {
+        lastNameErrorMsg.innerText = 'Veuillez indiquer un nom de famille.';
+        errorFormulaireLastName = true;
+        }
+    });
+
+// Ecoute du contenu du champ "adresse", Vérification de l'adresse et affichage d'un message si celle-ci n'est pas correcte
+inputAddress.addEventListener('change', function() {
+    let addressErrorMsg = inputAddress.nextElementSibling;
+    checkValueAddress = addressRegex.test(inputAddress.value);
+    if (checkValueAddress) {
+        addressErrorMsg.innerText = '';
+        errorFormulaireAddress = false;
+    }
+    else {
+        addressErrorMsg.innerText = 'Veuillez indiquer une adresse.';
+        errorFormulaireAddress = true;
+        }
+    });
+
+// Ecoute du contenu du champ "ville", Vérification de la ville et affichage d'un message si celle-ci n'est pas correcte
+inputCity.addEventListener('change', function() {
+    let cityErrorMsg = inputCity.nextElementSibling;
+    checkValueCity = textRegex.test(inputCity.value);
+    if (checkValueCity) {
+        cityErrorMsg.innerText = '';
+        errorFormulaireCity = false;
+    } else {
+        cityErrorMsg.innerText = 'Veuillez indiquer le nom d\'une ville.';
+        errorFormulaireCity = true;
+        }
+    });
+
+// Ecoute du contenu du champ "email", Vérification de l'email et affichage d'un message si celui-ci n'est pas correct
+inputEmail.addEventListener('change', function() {
+    let emailErrorMsg = inputEmail.nextElementSibling;
+    checkValueEmail = emailRegex.test(inputEmail.value);
+    if (checkValueEmail) {
+        emailErrorMsg.innerText = '';
+        errorFormulaireEmail = false;
+    }
+    else {
+        emailErrorMsg.innerText = 'Veuillez renseigner un email correct.';
+        errorFormulaireEmail = true;
+        }
+    });
+

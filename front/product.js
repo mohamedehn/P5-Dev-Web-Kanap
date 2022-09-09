@@ -56,7 +56,7 @@ let valueQuantity = document.getElementById('quantity').value; // récupération
 if (valueColor == '') {
 alert('Veuiller choisir une couleur'); // si couleur non selectionnée on revoir une alerte erreur
 } 
-else if (valueQuantity <= 0 || valueQuantity > 100) {
+else if (valueQuantity <= 0 || valueQuantity > 100 || Number.isInteger(valueQuantity)) {
 alert('Veuillez choisir une quantité entre 1 et 100'); // si quantité mal selectionnée, afin de respecter la tranche de 1 à 100
 } 
 else{
