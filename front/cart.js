@@ -1,37 +1,46 @@
 let monPanier = JSON.parse(localStorage.getItem('panier'));
-console.log(monPanier);
+ 
+//Si le client clique quand même sur le bouton commander, on lui rappelle que le panier est vide avec un message pop-up
+ boutonCommander = document.getElementById('order')
+ boutonCommander.addEventListener("click", ()=>{
+    if (ifBasketEmpty()){
+        alert("Votre panier est vide !");
+     }else{
+        if (!checkValueFirstName || !checkValueLastName || !checkValueAddress || !checkValueCity || !checkValueEmail){
+            alert("Merci de renseigner tous les champs du formulaire")
+        }else{
+            // Appelle de la fonction permettant de passer la commande
+            postOrder()
+        }
+    }
+ });
 
 // Création d'un panier sous forme d'array vide 
 let contenuPanier = []
+showListBasket()
 
 //_________Affichage des produits du LocalStorage_________
-
-//--------------Si le panier est vide (le localStorage est vide ou le tableau qu'il contient est vide), on affiche "Le panier est vide"--
-if(monPanier === null || monPanier.length === 0){
-    //Si le client clique quand même sur le bouton commander, on lui rappelle que le panier est vide avec un message pop-up
-    boutonCommander = document.getElementById('order')
-    boutonCommander.addEventListener("click", ()=>{
-        alert("Votre panier est vide !");
-    });
-}
-else{
-fetch("http://localhost:3000/api/products")
+/*
+*/
+function showListBasket(){ 
+    fetch("http://localhost:3000/api/products")
     .then(reponse => reponse.json())
     .then(data => {
         console.log(data)
-
+        let totalPrice = 0 // On définit le prix total
+        let totalQuantity = 0 // On définit la quantité total
 // on récupère la couleur, la quantité et l'id de tous les produits contenus dans le localstorage et on les met dans des variables. Pour ce faire on créer une boucle for afin d'atteindre tous les produits présent dans le localstorage
         for(let i = 0; i < monPanier.length; i++){
             let colorPanier = monPanier[i].color;
             let idPanier = monPanier[i].id;
-            quantityPanier = monPanier[i].quantity;
-      
+            let quantityPanier = monPanier[i].quantity;
+            totalQuantity += quantityPanier;
 //on ne récupère que les données des canapés dont _id (de l'api) correspondent à l'id dans le localStorage
             const contenuPanier = data.find((element) => element._id === idPanier);
 
 // Récupération du prix de chaque produit que l'on met dans une variable priceProductPanier
             priceProductPanier = contenuPanier.price;
-
+            totalPrice += priceProductPanier;
 //----Création ci-dessous des éléments html manquants de la page cart.html, dans la <section id="cart__items"> avec les informations des produits stockés dans le localstorage----
 
             const cartProduct = document.getElementById("cart__items");
@@ -110,9 +119,46 @@ fetch("http://localhost:3000/api/products")
             pDelete.setAttribute("class", "deleteItem");
             pDelete.innerText = "Supprimer";
             divContentSettingsDelete.appendChild(pDelete);
-    }}) 
+    }
+    let prixTotal = document.querySelector('#totalPrice')
+    prixTotal.textContent = totalPrice;
+
+    let totalQuantite = document.querySelector('#totalQuantity')
+    totalQuantite.textContent = totalQuantity;
+}) 
 }
 
+//--------------Si le panier est vide (le localStorage est vide ou le tableau qu'il contient est vide), on affiche "Le panier est vide"--
+function ifBasketEmpty(){
+    return (monPanier === null || monPanier.length === 0)
+}
+
+// Fonction permettant de passer la commande
+
+function postOrder (){
+    let infoUser = {
+        firstName : inputFirstName.value,
+        lastName : inputLastName.value,
+        address : inputAddress.value,
+        city : inputCity.value,
+        email : inputEmail.value
+    }
+    let order = {
+        contact : infoUser,
+        products : JSON.parse(localStorage.getItem('panier')).map(element =>element.id)
+    }
+    fetch("http://localhost:3000/api/products/order",{
+        method : 'POST',
+        headers : {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body : JSON.stringify(order)
+    })
+    .then(response => response.json())
+    .then((info) =>{
+        window.location.href = "confirmation.html?orderId="+info.orderId
+    }).catch(erreur => console.log(erreur))
+}
 
 //___________________________________Contrôle des infos avec Regex et Récupération des données du formulaire____________________________________
     
@@ -121,7 +167,7 @@ let textRegex = new RegExp("^[^.?!:;,/\\/_-]([. '-]?[a-zA-Zàâäéèêëïîô�
 let addressRegex = new RegExp("^[^.?!:;,/\\/_-]([, .:;'-]?[0-9a-zA-Zàâäéèêëïîôöùûüç])+[^.?!:;,/\\/_-]$");
 let emailRegex = new RegExp("^[^. ?!:;,/\\/_-]([._-]?[a-z0-9])+[^.?!: ;,/\\/_-][@][a-z0-9]+[.][a-z][a-z]+$");
 
-//Récupération des coordonnées du formulaire client et mise en variable
+//Récupération du formulaire client et mise en variable
 let inputFirstName = document.getElementById('firstName');
 let inputLastName = document.getElementById('lastName');
 let inputAddress = document.getElementById('address');
