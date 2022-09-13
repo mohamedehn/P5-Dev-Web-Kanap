@@ -248,3 +248,7 @@ inputEmail.addEventListener('change', function() {
         }
     });
 
+// Ecoute du bouton "supprimer"
+pDelete.addEventListener('click', () => {
+    
+})
