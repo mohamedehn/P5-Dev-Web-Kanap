@@ -42,64 +42,68 @@ function createDetailProduct(product){
     choiceColors.textContent = product.colors[choice]
     couleur.appendChild(choiceColors);
   }
-  
 }
 
 // Local Storage ----------------------
 const addToCart = document.getElementById('addToCart');
 /////////////////////////Au click "ajout au panier" ///////////////
 addToCart.addEventListener('click', () => {
-const valueColor = document.getElementById('colors').value; // récupération de la couleur choisie
-let valueQuantity = document.getElementById('quantity').value; // récupération de la quantité choisie
+  const valueColor = document.getElementById('colors').value; // récupération de la couleur choisie
+  let valueQuantity = JSON.parse(document.getElementById('quantity').value); // récupération de la quantité choisie
 
 // Contrôle si les choix sont définis et renvoi d'une alerte dans le cas contraire (réalisé avec if et else if afin d'avoir un double contrôle sur la quantité et la couleur). Les deux propriétés doivent être correctement saisies.
-if (valueColor == '') {
-alert('Veuiller choisir une couleur'); // si couleur non selectionnée on revoir une alerte erreur
-} 
-else if (valueQuantity <= 0 || valueQuantity > 100 || Number.isInteger(valueQuantity)) {
-alert('Veuillez choisir une quantité entre 1 et 100'); // si quantité mal selectionnée, afin de respecter la tranche de 1 à 100
-} 
-else{
-//Ajout de l'article choisi dans le local storage avec la variable "article"
-let article = {
-  id : id,
-  color : valueColor,
-  quantity : Number (valueQuantity),
-};
-alert("L'article a bien été ajouté au panier")
-// On récupère le panier si déjà présent dans le local storage
-let panier = JSON.parse(localStorage.getItem('panier'))
+  if (valueColor == '') {
+    alert('Veuiller choisir une couleur'); // si couleur non selectionnée on revoir une alerte erreur
+  } 
+  else if (valueQuantity <= 0 || valueQuantity > 100 || !Number.isInteger(valueQuantity)) {
+    alert('Veuillez choisir une quantité entre 1 et 100'); // si quantité mal selectionnée, afin de respecter la tranche de 1 à 100
+  } 
+  else{
+  //Ajout de l'article choisi dans le local storage avec la variable "article"
+  let article = {
+    id : id,
+    color : valueColor,
+    quantity : Number(valueQuantity),
+  };
+  // On récupère le panier si déjà présent dans le local storage
+  let panier = JSON.parse(localStorage.getItem('panier'))
 
-// Si le panier n'est pas vide, on va vérifier les ID présents et les couleurs afin d'incrémenter la quantité à défaut nous ajouterons l'article dans le panier
-if (panier != null) {  
-  console.log('Ici nous avons la valeur de :', article, panier);
-  let flag = false;
-  panier = panier.map((element)=>{
-    if(element.id === article.id && element.color === article.color){
-      element.quantity = article.quantity + element.quantity
-      flag = true
-      return element;
-    }else{
-      return element
-    }
+  // Si le panier n'est pas vide, on va vérifier les ID présents et les couleurs afin d'incrémenter la quantité à défaut nous ajouterons l'article dans le panier
+  if (panier != null) {  
+    console.log('Ici nous avons la valeur de :', article, panier);
+    let flag = false;
+    let quantityGreater100 = false;
+    panier = panier.map((element)=>{
+      if(element.id === article.id && element.color === article.color){
+        flag = true
+        if(article.quantity + element.quantity > 100){
+          quantityGreater100 = true
+          return element
+        }
+        element.quantity = article.quantity + element.quantity
+        return element;
+      }else{
+        return element
+      }
   })
   localStorage.setItem("panier", JSON.stringify(panier));
+  if (quantityGreater100){
+    alert("La quantité du produit existante dans le panier est supérieur à 100, merci de modifier votre quantité");
+  }else{
+    alert("L'article a bien été ajouté au panier")
+  }
   if(!flag) {
     console.log("L'article n'existe pas dans le panier");
     panier.push(article);
     localStorage.setItem("panier", JSON.stringify(panier));
   }
-}
-//S'il n'y a pas d'articles dans le local storage on crée un tableau vide auquel nous ajouterons l'article.
-else {
+}else { //S'il n'y a pas d'articles dans le local storage on crée un tableau vide auquel nous ajouterons l'article.
   panier = [];
   panier.push(article);
   localStorage.setItem("panier", JSON.stringify(panier));
   console.log(panier);
   alert("L'article a bien été ajouté au panier")
 }
-
-//window.location.href = "cart.html" --> lien vers le panier
 }
 });
 

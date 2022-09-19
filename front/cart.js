@@ -1,6 +1,4 @@
-let monPanier = JSON.parse(localStorage.getItem('panier'));
- 
-//Si le client clique quand même sur le bouton commander, on lui rappelle que le panier est vide avec un message pop-up
+ //Si le client clique quand même sur le bouton commander, on lui rappelle que le panier est vide avec un message pop-up
  boutonCommander = document.getElementById('order')
  boutonCommander.addEventListener("click", ()=>{
     if (ifBasketEmpty()){
@@ -23,6 +21,13 @@ showListBasket()
 /*
 */
 function showListBasket(){ 
+    let monPanier = JSON.parse(localStorage.getItem('panier'));
+// Permet de supprimer les enfants
+    const myNode = document.querySelector("#cart__items");
+    console.log(myNode);
+    while (myNode && myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
     fetch("http://localhost:3000/api/products")
     .then(reponse => reponse.json())
     .then(data => {
@@ -114,10 +119,13 @@ function showListBasket(){
             divContentSettingsDelete.setAttribute("class", "cart__item__content__settings__delete");
             divContentSettings.appendChild(divContentSettingsDelete);
 
-//------------------------Création d'une balise p qui indique le prix du canapé----------
+//-----------Création d'une balise p qui permet de supprimer l'article + ajout de l'écoute (on récupère l'ID et la couleur du produit)----------
             let pDelete = document.createElement('p');
             pDelete.setAttribute("class", "deleteItem");
             pDelete.innerText = "Supprimer";
+            pDelete.addEventListener("click", () =>{
+                deleteProduct(idPanier, colorPanier)
+            }); 
             divContentSettingsDelete.appendChild(pDelete);
     }
     let prixTotal = document.querySelector('#totalPrice')
@@ -248,7 +256,20 @@ inputEmail.addEventListener('change', function() {
         }
     });
 
-// Ecoute du bouton "supprimer"
-pDelete.addEventListener('click', () => {
-    
-})
+//Fonction Suppression d'un article du panier--------------------------------------------------
+
+function deleteProduct(idProduct, colorProduct) {
+    console.log("L'id du produit a supprimé est:",idProduct, "La couleur du produit a supprimé est :", colorProduct);
+    // On récupère les informations présents dans le panier
+    let monPanier = JSON.parse(localStorage.getItem('panier'));
+
+    //Je parcours et je supprime ce qui est présent dans ma condition. Ce qui créer un nouveau tableau avec les produits que l'ont veut conserver
+    let newBasket = [];
+    monPanier.forEach((element)=>{
+        if((element && (element.id != idProduct)) || (element && (element.color != colorProduct)))
+            newBasket.push (element) 
+    })
+    localStorage.clear();
+    localStorage.setItem("panier", JSON.stringify(newBasket));
+    showListBasket()
+}
