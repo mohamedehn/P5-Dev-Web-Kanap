@@ -20,14 +20,15 @@ showListBasket()
 //_________Affichage des produits du LocalStorage_________
 /*
 */
-function showListBasket(){ 
+function showListBasket(){
+// On récupère le panier stocké dans le localStorage 
     let monPanier = JSON.parse(localStorage.getItem('panier'));
-// Permet de supprimer les enfants
+// Boucle qui permet de supprimer les enfants lors de l'écoute du bouton supprimer indiqué plus loin dans la fonction.
     const myNode = document.querySelector("#cart__items");
-    console.log(myNode);
     while (myNode && myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
     }
+// On récupère les informations depuis l'API du backend
     fetch("http://localhost:3000/api/products")
     .then(reponse => reponse.json())
     .then(data => {
@@ -40,12 +41,12 @@ function showListBasket(){
             let idPanier = monPanier[i].id;
             let quantityPanier = monPanier[i].quantity;
             totalQuantity += quantityPanier;
-//on ne récupère que les données des canapés dont _id (de l'api) correspondent à l'id dans le localStorage
+//on ne récupère que les données des canapés dont _id (de l'api) correspondent à l'id dans le localStorage. Data.find correspond à l'ensemble des produits issu du serveur. L'élément permet ensuite de n'afficher que les produits déjà présent dans le localstorage.
             const contenuPanier = data.find((element) => element._id === idPanier);
 
-// Récupération du prix de chaque produit que l'on met dans une variable priceProductPanier
-            priceProductPanier = contenuPanier.price;
-            totalPrice += priceProductPanier;
+// On additionne à totalPrice, le prix de chaque produit présent dans le localstorage multiplié par la quantité de produits.
+            totalPrice += contenuPanier.price * quantityPanier;
+
 //----Création ci-dessous des éléments html manquants de la page cart.html, dans la <section id="cart__items"> avec les informations des produits stockés dans le localstorage----
 
             const cartProduct = document.getElementById("cart__items");
@@ -104,7 +105,7 @@ function showListBasket(){
             pQuantity.innerText = "Qté :";
             divContentSettingsQuantity.appendChild(pQuantity);
 
-//------------Création d'une balise input avec la classe "itemQuantity" qui permet de modifier la quantité-------
+//------------Création d'une balise input avec la classe "itemQuantity" qui permet de modifier la quantité + ajout de l'écoute permettant de modifier la quantité en récupérant la couleur et l'ID afin de modifier le local storage-------
             let pInput = document.createElement('input');
             pInput.setAttribute("type", "number");
             pInput.setAttribute("class", "itemQuantity");
@@ -112,6 +113,9 @@ function showListBasket(){
             pInput.setAttribute("min", "1");
             pInput.setAttribute("max", "100");
             pInput.setAttribute("value", `${quantityPanier}`);
+            pInput.addEventListener("change", ($event) =>{
+                modifyQuantity($event, idPanier, colorPanier)
+            })
             divContentSettingsQuantity.appendChild(pInput);
 
 //------------------Création de la div avec pour classe cart__item__content__settings__delete--------
@@ -119,7 +123,7 @@ function showListBasket(){
             divContentSettingsDelete.setAttribute("class", "cart__item__content__settings__delete");
             divContentSettings.appendChild(divContentSettingsDelete);
 
-//-----------Création d'une balise p qui permet de supprimer l'article + ajout de l'écoute (on récupère l'ID et la couleur du produit)----------
+//-----------Création d'une balise p qui permet de supprimer l'article + ajout de l'écoute (on récupère l'ID et la couleur du produit et on la supprime du local storage)----------
             let pDelete = document.createElement('p');
             pDelete.setAttribute("class", "deleteItem");
             pDelete.innerText = "Supprimer";
@@ -273,3 +277,46 @@ function deleteProduct(idProduct, colorProduct) {
     localStorage.setItem("panier", JSON.stringify(newBasket));
     showListBasket()
 }
+
+// Fonction pour modifier la quantité d'un article présent dans le panier ------
+
+function modifyQuantity($event, idPanier, colorPanier){
+    console.log('Ecoute de la fonction modifyQuantity, la valeur est : ',$event.target.value, $event);
+    console.log('Ecoute de id et color : ', idPanier, colorPanier);
+    const quantity = JSON.parse($event.target.value)
+    // On vérifie que la quantité modifié est bien comprise entre 1 et 100, à défaut on réactualise le panier avec la fonction showlistBasket
+    if (quantity <= 0 || quantity > 100 || !Number.isInteger(quantity)) {
+        alert('Veuillez choisir une quantité entre 1 et 100'); // si quantité mal selectionnée, afin de respecter la tranche de 1 à 100
+        showListBasket();
+    }else{
+        //Ajout de l'article choisi dans le local storage avec la variable "article"
+        let article = {
+            id : idPanier,
+            color : colorPanier,
+            quantity : Number(quantity),
+        };
+        // On récupère le panier si déjà présent dans le local storage
+        let panier = JSON.parse(localStorage.getItem('panier'))
+        let quantityGreater100 = false;
+        panier = panier.map((element)=>{
+          if(element.id === article.id && element.color === article.color){
+            if(article.quantity > 100){
+              quantityGreater100 = true
+              return element
+            }
+            element.quantity = article.quantity
+            return element;
+          }else{
+            return element
+          }
+    })
+    localStorage.setItem("panier", JSON.stringify(panier));
+    if (quantityGreater100){
+      alert("La quantité du produit existante dans le panier est supérieur à 100, merci de modifier votre quantité");
+    }
+    showListBasket();
+}
+}
+     
+
+
