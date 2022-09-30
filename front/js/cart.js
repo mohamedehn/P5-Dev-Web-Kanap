@@ -1,8 +1,10 @@
- //Si le client clique quand même sur le bouton commander alors que le panier est vide, on lui rappelle que le panier est vide avec un message pop-up. Pour ce faire on ajoute un évènement clique sur le bouton commander
- boutonCommander = document.getElementById('order')
- boutonCommander.addEventListener("click", ()=>{
-     // Condition avec if et appel d'une fonction ifBasketEmpty (si le panier est vide) + message d'alerte le cas échéant
-    if (ifBasketEmpty()){
+// On récupère le contenu du local storage
+let monPanier = JSON.parse(localStorage.getItem('panier'));
+//Si le client clique quand même sur le bouton commander alors que le panier est vide, on lui rappelle que le panier est vide avec un message pop-up. Pour ce faire on ajoute un évènement clique sur le bouton commander
+boutonCommander = document.getElementById('order')
+boutonCommander.addEventListener("click", () => {
+    // Condition avec if et appel d'une fonction ifBasketEmpty (si le panier est vide) + message d'alerte le cas échéant
+    if(ifBasketEmpty()){
         alert("Votre panier est vide !");
         // Sinon on vérifie que tous les champs sont renseignés
     }else{
@@ -187,7 +189,7 @@ function postOrder (){
 //Création des expressions régulières pour contrôler les infos entrées par l'utilisateur
 let textRegex = new RegExp("^[^.?!:;,/\\/_-]([. '-]?[a-zA-Zàâäéèêëïîôöùûüç])+[^.?!:;,/\\/_-]$");
 let addressRegex = new RegExp("^[^.?!:;,/\\/_-]([, .:;'-]?[0-9a-zA-Zàâäéèêëïîôöùûüç])+[^.?!:;,/\\/_-]$");
-let emailRegex = new RegExp("^[^. ?!:;,/\\/_-]([._-]?[a-z0-9])+[^.?!: ;,/\\/_-][@][a-z0-9]+[.][a-z][a-z]+$");
+let emailRegex = new RegExp('^[a-zA-Z0-9._-]+[@]{1}[a-zA-Z0-9._-]+[.]{1}[a-z]{2,10}$', 'g');
 
 //Récupération du formulaire client et mise en variable
 let inputFirstName = document.getElementById('firstName');
